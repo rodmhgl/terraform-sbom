@@ -7,6 +7,7 @@ This repository contains a Terraform module for generating a Software Bill of Ma
 - [Introduction](#introduction)
 - [Features](#features)
 - [Requirements](#requirements)
+- [Downloads](#downloads)
 - [Usage](#usage)
 - [Inputs](#inputs)
 - [Outputs](#outputs)
@@ -26,10 +27,14 @@ The Terraform SBOM module helps you create a detailed inventory of all the softw
 - [Terraform](https://www.terraform.io/downloads.html) >= 0.12
 - [Go](https://golang.org/dl/) (for building the SBOM generator)
 
+## Downloads
+
+[https://github.com/rodmhgl/terraform-sbom/releases](https://github.com/rodmhgl/terraform-sbom/releases)
+
 ## Usage
 
 ```shell
-go run main.go /path/to/terraform/config output.csv
+./terraform-sbom /path/to/terraform/config output.csv
 ```
 
 ## Contributing
