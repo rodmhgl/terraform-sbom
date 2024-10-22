@@ -1,6 +1,6 @@
 module rodstewart/terraform-sbom
 
-go 1.23.1
+go 1.23
 
 require github.com/hashicorp/terraform-config-inspect v0.0.0-20240801114854-6714b46f5fe4
 
