@@ -191,7 +191,7 @@ func main() {
 		printSBOM(sbom)
 	}
 
-	switch *outputFormat {
+	switch strings.ToLower(*outputFormat) {
 	case "csv":
 		err = writeSBOMToCSV(sbom, outputPath)
 	case "json":
