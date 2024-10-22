@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"log"
@@ -15,16 +17,17 @@ import (
 // ModuleInfo represents the information about a Terraform module.
 // It includes the module's name, source, version, and configuration.
 type ModuleInfo struct {
-	Name    string
-	Source  string
-	Version string
-	Config  string
+	Name    string `json:"name" xml:"Name"`
+	Source  string `json:"source" xml:"Source"`
+	Version string `json:"version" xml:"Version"`
+	Config  string `json:"config" xml:"ConfigPath"`
 }
 
 // SBOM represents a Software Bill of Materials (SBOM) which contains a list of modules.
 // It is used to track the components and dependencies of the Terraform config.
 type SBOM struct {
-	Modules []ModuleInfo
+	XMLName xml.Name     `json:"-" xml:"SBOM"` // Root element in the XML
+	Modules []ModuleInfo `json:"modules" xml:"Modules>Module"`
 }
 
 // generateSBOM generates a Software Bill of Materials (SBOM) for a given Terraform configuration.
@@ -121,6 +124,46 @@ func writeSBOMToCSV(sbom *SBOM, outputPath string) error {
 	return nil
 }
 
+// writeSBOMToJSON writes the SBOM to a JSON file
+func writeSBOMToJSON(sbom *SBOM, outputPath string) error {
+	file, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create JSON file: %v", err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ") // Pretty print the JSON
+
+	err = encoder.Encode(sbom)
+	if err != nil {
+		return fmt.Errorf("failed to write JSON file: %v", err)
+	}
+
+	fmt.Printf("SBOM successfully written to %s\n", outputPath)
+	return nil
+}
+
+// writeSBOMToXML writes the SBOM to an XML file
+func writeSBOMToXML(sbom *SBOM, outputPath string) error {
+	file, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create XML file: %v", err)
+	}
+	defer file.Close()
+
+	encoder := xml.NewEncoder(file)
+	encoder.Indent("", "  ") // Pretty print the XML
+
+	err = encoder.Encode(sbom)
+	if err != nil {
+		return fmt.Errorf("failed to write XML file: %v", err)
+	}
+
+	fmt.Printf("SBOM successfully written to %s\n", outputPath)
+	return nil
+}
+
 // fileExists checks if a file exists at the given file path.
 func fileExists(filePath string) bool {
 	_, err := os.Stat(filePath)
@@ -129,10 +172,11 @@ func fileExists(filePath string) bool {
 
 func main() {
 	verbose := flag.Bool("v", false, "Enable verbose output")
+	outputFormat := flag.String("output", "csv", "Specify output format: csv, json, or xml. Defaults to csv")
 	flag.Parse()
 
 	if flag.NArg() < 2 {
-		log.Fatalf("Usage: %s <path-to-terraform-config> <output-csv-file>", filepath.Base(os.Args[0]))
+		log.Fatalf("Usage: %s <path-to-terraform-config> <output-file>", filepath.Base(os.Args[0]))
 	}
 
 	configPath := flag.Arg(0)
@@ -147,8 +191,18 @@ func main() {
 		printSBOM(sbom)
 	}
 
-	err = writeSBOMToCSV(sbom, outputPath)
+	switch strings.ToLower(*outputFormat) {
+	case "csv":
+		err = writeSBOMToCSV(sbom, outputPath)
+	case "json":
+		err = writeSBOMToJSON(sbom, outputPath)
+	case "xml":
+		err = writeSBOMToXML(sbom, outputPath)
+	default:
+		log.Fatalf("Unsupported output format: %s. Supported formats are: csv, json, xml", *outputFormat)
+	}
+
 	if err != nil {
-		log.Fatalf("Error writing SBOM to CSV: %v", err)
+		log.Fatalf("Error writing SBOM: %v", err)
 	}
 }

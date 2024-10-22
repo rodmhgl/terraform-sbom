@@ -1,4 +1,4 @@
-module rodstewart/terraform_sbom
+module rodstewart/terraform-sbom
 
 go 1.23.1
 
