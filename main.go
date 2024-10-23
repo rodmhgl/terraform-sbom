@@ -45,10 +45,9 @@ func generateSBOM(configPath string) (*SBOM, error) {
 		modInfo := ModuleInfo{
 			Name:   modCall.Name,
 			Source: modCall.Source,
-			Config: configPath, // Store the config path in the module info
+			Config: configPath,
 		}
 
-		// Try to extract version from the module source or version field
 		modInfo.Version = extractVersion(modCall)
 
 		sbom.Modules = append(sbom.Modules, modInfo)
@@ -133,7 +132,7 @@ func writeSBOMToJSON(sbom *SBOM, outputPath string) error {
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ") // Pretty print the JSON
+	encoder.SetIndent("", "  ")
 
 	err = encoder.Encode(sbom)
 	if err != nil {
@@ -153,7 +152,7 @@ func writeSBOMToXML(sbom *SBOM, outputPath string) error {
 	defer file.Close()
 
 	encoder := xml.NewEncoder(file)
-	encoder.Indent("", "  ") // Pretty print the XML
+	encoder.Indent("", "  ")
 
 	err = encoder.Encode(sbom)
 	if err != nil {
