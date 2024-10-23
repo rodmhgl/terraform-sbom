@@ -37,6 +37,16 @@ The Terraform SBOM module helps you create a detailed inventory of all the softw
 ./terraform-sbom /path/to/terraform/config output.csv
 ```
 
+```shell
+./terraform-sbom -output json /path/to/terraform/config output.json
+```
+
+```shell
+./terraform-sbom -output xml /path/to/terraform/config output.xml
+```
+
+**NOTE:** CSV results will be appended if you have multiple runs using the same file name.
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any changes.
